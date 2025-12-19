@@ -344,6 +344,60 @@ def generate_portal(output_dir, total_stats):
     
     print(f"✅ 总门户已生成: {output_file}")
 
+def collect_repo_stats(repo_path):
+    """快速收集仓库统计数据"""
+    try:
+        # 总提交数
+        result = subprocess.run(
+            ['git', 'rev-list', '--count', 'HEAD'],
+            cwd=repo_path,
+            capture_output=True,
+            text=True
+        )
+        commits = int(result.stdout.strip()) if result.returncode == 0 else 0
+        
+        # 总文件数
+        result = subprocess.run(
+            ['git', 'ls-files'],
+            cwd=repo_path,
+            capture_output=True,
+            text=True
+        )
+        files = len([l for l in result.stdout.strip().split('\n') if l]) if result.returncode == 0 else 0
+        
+        # 代码行数统计（简化版）
+        result = subprocess.run(
+            ['git', 'log', '--all', '--numstat', '--pretty=format:'],
+            cwd=repo_path,
+            capture_output=True,
+            text=True
+        )
+        additions = 0
+        if result.returncode == 0:
+            for line in result.stdout.split('\n'):
+                parts = line.split('\t')
+                if len(parts) >= 1 and parts[0].isdigit():
+                    additions += int(parts[0])
+        
+        # Merge commits
+        result = subprocess.run(
+            ['git', 'log', '--all', '--merges', '--oneline'],
+            cwd=repo_path,
+            capture_output=True,
+            text=True
+        )
+        merges = len([l for l in result.stdout.strip().split('\n') if l]) if result.returncode == 0 else 0
+        
+        return {
+            'commits': commits,
+            'files': files,
+            'additions': additions,
+            'merges': merges
+        }
+    except Exception as e:
+        print(f"⚠️  统计收集错误: {e}")
+        return {'commits': 0, 'files': 0, 'additions': 0, 'merges': 0}
+
 def main():
     """主函数：一键生成所有统计"""
     script_dir = Path(__file__).parent
@@ -371,6 +425,14 @@ def main():
             print(f"⚠️  跳过: 仓库路径不存在 - {repo_path}")
             continue
         
+        # 收集统计数据
+        print("   收集统计数据...")
+        repo_stats = collect_repo_stats(repo_path)
+        total_stats['total_commits'] += repo_stats['commits']
+        total_stats['total_files'] += repo_stats['files']
+        total_stats['total_additions'] += repo_stats['additions']
+        total_stats['total_merges'] += repo_stats['merges']
+        
         # 调用原有的生成脚本
         cmd = [
             'python3',
@@ -385,10 +447,6 @@ def main():
         
         if result.returncode != 0:
             print(f"❌ 错误: {result.stderr}")
-        else:
-            # 尝试读取生成的统计数据（简化版）
-            # 这里可以改进为解析HTML或保存JSON中间文件
-            pass
     
     print("\n" + "=" * 60)
     print("📊 生成总门户页面...")
