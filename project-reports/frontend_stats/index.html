@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端模块 (Frontend) - 禾盈慧项目统计</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-10%, -10%) scale(1.1); }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .brand {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        .header .subtitle {
+            opacity: 0.95;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 32px 24px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .stat-card:last-child {
+            border-right: none;
+        }
+        
+        .stat-card:hover {
+            background: var(--light);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .stat-card .label {
+            font-size: 13px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 48px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: gap 0.3s ease;
+        }
+        
+        .back-link:hover {
+            gap: 12px;
+        }
+        
+        /* Section Styling */
+        .section {
+            margin-bottom: 56px;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .section-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            flex: 1;
+        }
+        
+        .section-header .icon {
+            font-size: 28px;
+        }
+        
+        /* Table Styling */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        
+        .data-table thead {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        }
+        
+        .data-table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-table td {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .data-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #fafbfc;
+            transform: scale(1.01);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            background: linear-gradient(135deg, #fafbfc 0%, #f3f4f6 100%);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        /* Bar Chart */
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .bar-label {
+            min-width: 90px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4b5563;
+        }
+        
+        .bar-track {
+            flex: 1;
+            height: 32px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 12px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 40px;
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 32px;
+            justify-content: center;
+        }
+        
+        .badge-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .badge-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: 24px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .timeline-date {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .timeline-author {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        
+        .timeline-subject {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+        
+        /* Scrollbar Styling */
+        .timeline::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .timeline::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .timeline::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content {
+                padding: 24px;
+            }
+            .header {
+                padding: 40px 24px;
+            }
+            .header h1 {
+                font-size: 32px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .stat-card {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .stat-card:last-child {
+                border-bottom: none;
+            }
+            .bar-label {
+                min-width: 60px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="brand">禾盈慧 • HeYingHui</div>
+                <h1>前端模块 (Frontend)</h1>
+                <p class="subtitle">Git 仓库协作统计分析报告</p>
+                <p class="subtitle" style="margin-top: 4px; font-size: 14px;">生成时间: 2025年12月19日 16:05:32</p>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">📝</div>
+                <div class="label">总提交数</div>
+                <div class="value">126</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">👥</div>
+                <div class="label">贡献者</div>
+                <div class="value">5</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">📁</div>
+                <div class="label">文件总数</div>
+                <div class="value">345</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">✨</div>
+                <div class="label">代码变更</div>
+                <div class="value">201,475</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <a href="../index.html" class="back-link">
+                <span>←</span>
+                <span>返回总门户</span>
+            </a>
+            
+            <div class="section">
+                <div class="section-header">
+                    <span class="icon">👥</span>
+                    <h2>贡献者排行榜</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">排名</th>
+                            <th>贡献者</th>
+                            <th style="width: 100px;">提交次数</th>
+                            <th style="width: 100px;">新增行数</th>
+                            <th style="width: 100px;">删除行数</th>
+                            <th style="width: 100px;">修改文件</th>
+                            <th style="width: 120px;">首次提交</th>
+                            <th style="width: 120px;">最后提交</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge">#1</span></td>
+                            <td><strong style="color: var(--dark);">蒲显科</strong></td>
+                            <td><strong>77</strong></td>
+                            <td><span class="badge-success" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">+177,322</span></td>
+                            <td><span class="badge-danger" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">-40,348</span></td>
+                            <td>476</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-09-23</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-12-18</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#2</span></td>
+                            <td><strong style="color: var(--dark);">张琪</strong></td>
+                            <td><strong>24</strong></td>
+                            <td><span class="badge-success" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">+4,426</span></td>
+                            <td><span class="badge-danger" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">-1,215</span></td>
+                            <td>42</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-10-12</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-12-07</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#3</span></td>
+                            <td><strong style="color: var(--dark);">Xianke Pu</strong></td>
+                            <td><strong>12</strong></td>
+                            <td><span class="badge-success" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">+0</span></td>
+                            <td><span class="badge-danger" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">-0</span></td>
+                            <td>0</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-10-31</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-12-07</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#4</span></td>
+                            <td><strong style="color: var(--dark);">曹棪</strong></td>
+                            <td><strong>8</strong></td>
+                            <td><span class="badge-success" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">+13,764</span></td>
+                            <td><span class="badge-danger" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">-5,053</span></td>
+                            <td>56</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-11-01</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-12-04</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#5</span></td>
+                            <td><strong style="color: var(--dark);">2301_79648705</strong></td>
+                            <td><strong>6</strong></td>
+                            <td><span class="badge-success" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">+5,963</span></td>
+                            <td><span class="badge-danger" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">-1,192</span></td>
+                            <td>18</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-11-20</td>
+                            <td style="color: #6b7280; font-size: 13px;">2025-12-04</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <span class="icon">📅</span>
+                    <h2>提交历史时间线</h2>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-18 20:08</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: 添加手册查看按钮并优化区域描述文本</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-15 06:48</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: 增强市场详情面板和价格预测页面的交互体验，添加预览功能和背景加载指示</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-15 04:49</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: enhance loading and error handling in MarketDetailPanel and price-prediction</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-15 02:04</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: enhance price prediction page with market selection and heatmap controls</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-14 05:40</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat:价格预测区域宏观</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-14 01:26</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: Enhance Product Selector and Price Prediction Page</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-13 20:38</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: 添加探索模式支持，更新市场加载逻辑和市场点击处理</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-13 04:11</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">refactor: migrate map components to use OpenLayers, update map rendering and user markers</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-13 02:18</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">fix: 更新侧边栏折叠状态以保持一致性，优化已读率显示逻辑，添加新的Lucide图标</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-13 01:30</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">chore: add sorting fields to PaginationDto for improved data handling</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-12 16:41</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">fix:角色中心核心指标组</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-07 17:19</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge pull request #25 from HeYingHui-BJTU/feature/tech-appointment</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-07 13:48</div>
+                        <div class="timeline-author">张琪</div>
+                        <div class="timeline-subject">问答社区更改</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-06 16:59</div>
+                        <div class="timeline-author">张琪</div>
+                        <div class="timeline-subject">Merge branch 'feature/tech-appointment' of https://github.com/HeYingHui-BJTU/frontend into feature/tech-appointment</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-06 16:27</div>
+                        <div class="timeline-author">张琪</div>
+                        <div class="timeline-subject">Merge pull request #24 from HeYingHui-BJTU/master</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-05 00:58</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">Merge branch 'master' of github.com:HeYingHui-BJTU/frontend</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-05 00:57</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge pull request #23 from HeYingHui-BJTU/cy</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-05 00:56</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">Refactor:UI consistency</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-04 21:44</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge pull request #22 from HeYingHui-BJTU/feature/tech-appointment</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-04 21:42</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge pull request #21 from HeYingHui-BJTU/ND1204</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-04 21:27</div>
+                        <div class="timeline-author">2301_79648705</div>
+                        <div class="timeline-subject">购物车</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-04 21:06</div>
+                        <div class="timeline-author">张琪</div>
+                        <div class="timeline-subject">视频内置播放器</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-04 20:18</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat:任务模板配置</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-04 13:07</div>
+                        <div class="timeline-author">张琪</div>
+                        <div class="timeline-subject">Merge pull request #20 from HeYingHui-BJTU/master</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-04 12:55</div>
+                        <div class="timeline-author">曹棪</div>
+                        <div class="timeline-subject">Merge master and update finance components</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-03 23:53</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat：asr+tts</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-03 11:56</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat：融资中心、市场中心</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-03 11:06</div>
+                        <div class="timeline-author">张琪</div>
+                        <div class="timeline-subject">Merge pull request #19 from HeYingHui-BJTU/master</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-12-03 03:34</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">和掌柜</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-30 02:36</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">多视图体验</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-30 00:12</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat:预约中心</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-29 20:05</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">fix:专家预约</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-29 14:33</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">refactor：重构路由系统，准备开启第三阶段</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-29 12:05</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat:任务调度中心</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-29 04:45</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat:任务调度中心</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-29 00:21</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat(专家预约)：打造心流体验</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-28 20:38</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">IM赋能</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-28 14:42</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat:专家预约</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-28 03:35</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: 优化角色列表和菜单树组件的选中状态管理</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-28 03:19</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">Merge branch 'master' of github.com:HeYingHui-BJTU/frontend</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-28 03:18</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: 添加根据角色ID获取所有用户的接口，并优化角色用户获取逻辑</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-28 02:39</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat(价格预测)：C型布局+双模式交互</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 21:13</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat: 价格预测的一些组件</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 18:08</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge pull request #18 from HeYingHui-BJTU/nd-1123</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 18:03</div>
+                        <div class="timeline-author">2301_79648705</div>
+                        <div class="timeline-subject">精简</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 15:37</div>
+                        <div class="timeline-author">蒲显科</div>
+                        <div class="timeline-subject">feat:模型预测组件</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 15:25</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge pull request #17 from HeYingHui-BJTU/cy</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 15:09</div>
+                        <div class="timeline-author">曹棪</div>
+                        <div class="timeline-subject">chore: sync cy with master</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 15:04</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge pull request #16 from HeYingHui-BJTU/nd-1123</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025-11-27 14:59</div>
+                        <div class="timeline-author">Xianke Pu</div>
+                        <div class="timeline-subject">Merge branch 'master' into nd-1123</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <span class="icon">⏰</span>
+                    <h2>活跃时段分析</h2>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">按小时分布</div>
+                    <div class="bar-chart">
+                        <div class="bar">
+                            <div class="bar-label">00:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 100.0%">12</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">01:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 50.0%">6</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">02:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 83.33333333333334%">10</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">03:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 50.0%">6</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">04:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 83.33333333333334%">10</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">05:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 16.666666666666664%">2</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">06:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 16.666666666666664%">2</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">07:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 0.0%"></div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">08:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 0.0%"></div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">09:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 0.0%"></div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">10:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 25.0%">3</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">11:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 50.0%">6</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">12:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 33.33333333333333%">4</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">13:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 58.333333333333336%">7</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">14:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 75.0%">9</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">15:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 75.0%">9</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">16:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 33.33333333333333%">4</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">17:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 25.0%">3</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">18:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 41.66666666666667%">5</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">19:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 25.0%">3</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">20:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 66.66666666666666%">8</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">21:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 100.0%">12</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">22:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 8.333333333333332%">1</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">23:00</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 41.66666666666667%">5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">按星期分布</div>
+                    <div class="bar-chart">
+                        <div class="bar">
+                            <div class="bar-label">周一</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 18.181818181818183%">6</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">周二</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 21.21212121212121%">7</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">周三</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 42.42424242424242%">14</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">周四</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 100.0%">33</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">周五</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 57.57575757575758%">19</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">周六</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 84.84848484848484%">28</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">周日</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 60.60606060606061%">20</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <span class="icon">📁</span>
+                    <h2>文件类型分布</h2>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Top 10 文件类型</div>
+                    <div class="bar-chart">
+                        <div class="bar">
+                            <div class="bar-label">.vue</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 100.0%">204</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.ts</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 49.50980392156863%">101</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.md</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 4.411764705882353%">9</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.jpeg</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 2.941176470588235%">6</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.json</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 1.9607843137254901%">4</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">无扩展名</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 1.4705882352941175%">3</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.js</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 1.4705882352941175%">3</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.png</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 1.4705882352941175%">3</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.glb</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 0.9803921568627451%">2</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">.css</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 0.9803921568627451%">2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <span class="icon">📈</span>
+                    <h2>月度提交趋势</h2>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">最近12个月提交活跃度</div>
+                    <div class="bar-chart">
+                        <div class="bar">
+                            <div class="bar-label">2025-09</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 4.0%">3</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">2025-10</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 26.666666666666668%">20</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">2025-11</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 100.0%">75</div>
+                            </div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">2025-12</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: 38.666666666666664%">29</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 添加平滑滚动和加载动画
+        document.addEventListener('DOMContentLoaded', function() {{
+            // 为表格行添加延迟动画
+            const rows = document.querySelectorAll('.data-table tbody tr');
+            rows.forEach((row, index) => {{
+                row.style.animation = `slideUp 0.3s ease-out ${{index * 0.05}}s both`;
+            }});
+            
+            // 为条形图添加延迟动画
+            const bars = document.querySelectorAll('.bar-fill');
+            bars.forEach((bar, index) => {{
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {{
+                    bar.style.width = width;
+                }}, 100 + index * 30);
+            }});
+        }});
+    </script>
+</body>
+</html>
